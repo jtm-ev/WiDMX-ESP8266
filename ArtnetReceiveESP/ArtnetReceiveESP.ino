@@ -1,8 +1,8 @@
 #include <Artnet.h>
 
 //WS2812 specific - testing only
-#include <WS2812FX.h>
-WS2812FX ws2812fx  = WS2812FX(1, 5, NEO_GRBW + NEO_KHZ800);
+#include <Adafruit_NeoPixel.h>
+Adafruit_NeoPixel strip  = Adafruit_NeoPixel(4, 5, NEO_GRBW + NEO_KHZ800);
 
 const char* ssid     = "yourssid";
 const char* password = "yourpassword";
@@ -10,13 +10,13 @@ const char* password = "yourpassword";
 float t = 0;
 
 int intensity_r = 0;
-float fade_r = 0;
+float fade_r = 255;
 
 int intensity_g = 0;
-float fade_g = 0;
+float fade_g = 255;
 
 int intensity_b = 0;
-float fade_b = 0;
+float fade_b = 255;
 
 Artnet artnet;
 
@@ -46,10 +46,9 @@ void setup()
   artnet.begin();
 
   //WS2812 specific - testing only
-  ws2812fx.init();
-  ws2812fx.setBrightness(255);
-  ws2812fx.setMode(FX_MODE_STATIC);
-  ws2812fx.start();
+  strip.setBrightness(255);
+  strip.begin();
+  strip.show();
 }
 
 void loop()
@@ -63,8 +62,11 @@ void loop()
   float value_b = (cos(t - PI) * (0.5 - (0.5 * intensity_b) / 255) + 0.5) * 255 + (intensity_b / 2);
   value_b = value_b * (fade_b / 255.0);
   
-  ws2812fx.setPixelColor(0, value_r, value_g, value_b);
-  ws2812fx.show();
+  strip.setPixelColor(0, value_r, value_g, value_b);
+  strip.setPixelColor(1, value_r, value_g, value_b);
+  strip.setPixelColor(2, value_r, value_g, value_b);
+  strip.setPixelColor(3, value_r, value_g, value_b);
+  strip.show();
   if (artnet.read() == ART_DMX)
   {
     // print out data of Channel 0, universe 0
@@ -79,8 +81,8 @@ void loop()
       intensity_b = artnet.getDmxFrame()[4];
       fade_b = artnet.getDmxFrame()[5];
       //WS2812 specific - testing only
-      //ws2812fx.setPixelColor(0, artnet.getDmxFrame()[0], artnet.getDmxFrame()[1], artnet.getDmxFrame()[2]);
-      //ws2812fx.show();
+      //strip.setPixelColor(0, artnet.getDmxFrame()[0], artnet.getDmxFrame()[1], artnet.getDmxFrame()[2]);
+      //strip.show();
       //Serial.println(artnet.getDmxFrame()[0]);
     }
   }
